@@ -1,0 +1,60 @@
+{
+  "_about": "Hand-edited site text. Update the rules, payouts, rule changes and power ranking notes here; the Tuesday job rebuilds the site from it. Source: the league Google Doc.",
+  "founded": 2018,
+  "format": [
+    ["Teams", "12, in three divisions of 4"],
+    ["Regular season", "14 weeks (13 in 2019 and 2020)"],
+    ["Playoffs", "6 teams, Weeks 15–17. Seeds 1 and 2 get a first-round bye."],
+    ["Roster limits", "1 IR slot. Maximum of 8 WRs and 8 RBs."]
+  ],
+  "seeding": [
+    ["1st seed", "Division winner with the best record"],
+    ["2nd seed", "Division winner with the 2nd best record"],
+    ["3rd seed", "Division winner with the 3rd best record"],
+    ["4th seed", "Non-division winner with the best record"],
+    ["5th seed", "Non-division winner with the 2nd best record"],
+    ["6th seed", "Most points scored among teams not in the top 5 seeds"]
+  ],
+  "rematchRule": "Teams that play each other twice in the postseason, in the winner's or consolation bracket, are decided by their combined points across both games. Example: Quincy 144.86 and 113.24 vs Nick 122.64 and 119.46 gives Quincy the win, 258.10 to 242.10.",
+  "transactions": [
+    ["FAAB", "$100 budget. Budgets reset to $100 at the start of the postseason, for both the playoffs and the consolation bracket."],
+    ["Trades", "FAAB can be included in trades."]
+  ],
+  "trophies": [
+    ["Champion", "Winner of the playoff bracket"],
+    ["Tropny", "Winner of the consolation bracket (7th place), since 2021"],
+    ["Toilet Bowl", "Last-place finisher"]
+  ],
+  "payouts": {
+    "buyIn": "$35",
+    "rows": [["Champion", "$240"], ["2nd place", "$70 (2× buy-in)"], ["3rd place", "$35 (money back)"], ["Highest scorer", "$70 (2× buy-in)"]],
+    "note": "A champion who is also the highest scorer collects both payouts. The same applies to 2nd and 3rd place."
+  },
+  "draftOrder": [
+    "The order in which owners choose their draft slot, not the draft order itself:",
+    "1. Champion  2. Highest scorer (most wins breaks ties)  3. 2nd place  4. 3rd place  5. Tropny winner  6. 4th place, and so on.",
+    "If the champion is also the highest scorer, 2nd place chooses second. If the highest scorer finished in the top four, the Tropny winner chooses 5th; otherwise 6th.",
+    "New members choose last, in a random order."
+  ],
+  "changelog": [
+    {"season": 2026, "label": "2026 rules vote", "items": [
+      ["chg", "The 6th seed stays with the highest-scoring team outside the top 5, rather than best record."],
+      ["add", "FAAB budgets reset to $100 at the start of the postseason, for the playoffs and the consolation bracket."],
+      ["add", "FAAB can now be included in trades."],
+      ["chg", "Roster keeps 1 IR slot."],
+      ["chg", "WR and RB limit stays at 8 per position."]
+    ]},
+    {"season": 2022, "label": "2022 season", "items": [
+      ["add", "6th seed rule: the 6th seed goes to the highest-scoring team outside the top 5 seeds."]
+    ]},
+    {"season": 2021, "label": "2021 season", "items": [
+      ["chg", "Playoff field shrinks from 8 teams to 6."],
+      ["chg", "Regular season grows from 13 to 14 weeks."],
+      ["add", "The Tropny is created for the consolation bracket winner."]
+    ]},
+    {"season": 2019, "label": "2019 season", "items": [
+      ["chg", "League expands from 8 teams to 12, in three divisions. Record books start here."]
+    ]}
+  ],
+  "powerNotes": {}
+}

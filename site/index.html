@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Footballs & Flagons</title>
+<meta name="description" content="Standings, the playoff race, power rankings, record books and rivalries for the Footballs & Flagons Fantasy Football League.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Roboto+Condensed:wght@500;700&family=Roboto:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="brand" href="#home" aria-label="Footballs & Flagons home">
+      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><path d="M18 2 32 8v10c0 8-6 14-14 16C10 32 4 26 4 18V8Z" fill="#c9a13b"/><path d="M18 5 29 10v8c0 6.5-4.8 11.4-11 13-6.2-1.6-11-6.5-11-13v-8Z" fill="#1c1d21"/><ellipse cx="18" cy="18" rx="8" ry="5" transform="rotate(-35 18 18)" fill="#c9a13b"/><path d="m14.5 21 7-6M16 17.5l1.5 1.5M18 16l1.5 1.5M17 20l1.5 1.5" stroke="#1c1d21" stroke-width="1.2"/></svg>
+      <span><b>Footballs &amp; Flagons</b><small id="tagline">Fantasy Football League</small></span>
+    </a>
+    <button class="menu" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav id="nav">
+      <a href="#home">Home</a>
+      <a href="#season">Season</a>
+      <a href="#power">Power Rankings</a>
+      <a href="#records">League Record Books</a>
+      <a href="#h2h">Head-to-Head</a>
+      <a href="#rules">Rulebook</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="hero"><div class="in" id="heroIn"></div></section>
+
+<main id="main">
+  <p class="loading" id="loading">Loading league data…</p>
+
+  <section class="view" data-view="home" hidden>
+    <div class="grid">
+      <div class="stack">
+        <div class="panel"><div class="phd"><h3 id="upTitle">This week</h3><span id="upSub"></span></div><div id="homeUpcoming"></div></div>
+        <div class="panel"><div class="phd"><h3 id="lastTitle">Last week</h3><span>Final scores</span></div><div id="homeLast"></div></div>
+        <div class="panel"><div class="phd"><h3>Playoff picture</h3><span id="homePoSub"></span></div><div class="tw"><table id="homeStand"></table></div></div>
+      </div>
+      <div class="stack">
+        <div class="panel"><h3>Power ranking #1</h3><div class="pad" id="homePR"></div></div>
+        <div class="panel"><h3>Latest rule changes</h3><div class="pad" id="homeRule"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" data-view="season" hidden>
+    <div class="phead"><div><div class="eyebrow" id="seasonEyebrow"></div><h2>Season</h2></div></div>
+    <div class="tabs" role="tablist" aria-label="Season views">
+      <button role="tab" id="tab-reg" aria-controls="pane-reg" aria-selected="true">Regular Season</button>
+      <button role="tab" id="tab-po" aria-controls="pane-po" aria-selected="false">Playoff Picture</button>
+    </div>
+    <div role="tabpanel" id="pane-reg" aria-labelledby="tab-reg">
+      <div class="panel"><div class="tw"><table id="seasonTable"></table></div></div>
+      <div class="legend"><span><span class="seed">1</span> Current playoff seed</span><span><span class="seed six">6</span> 6th seed (points leader)</span><span>Record ties broken by points for</span></div>
+    </div>
+    <div role="tabpanel" id="pane-po" aria-labelledby="tab-po" hidden>
+      <div class="rulebox"><div class="n">6</div><div>
+        <p><strong>How the 6th seed rule works.</strong> Six teams make the playoffs. Seeds 1–3 go to the three division winners and seeds 4–5 to the best remaining records. Seed 6 goes to the team with the most points scored among everyone left, no matter their record.</p>
+        <p>Seeds 1 and 2 get a first-round bye. Record ties are broken by points for.</p>
+      </div></div>
+      <div class="snap" id="snap"></div>
+      <div class="stack">
+        <div class="panel"><div class="phd"><h3>Seeds 1–5: in by record</h3><span>Division winners, then best records</span></div><div class="tw"><table id="poTop"></table></div></div>
+        <div class="panel"><div class="phd"><h3>Race for the 6th seed</h3><span>All teams outside the top 5, ranked by points scored</span></div><div class="tw"><table id="poSix"></table></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" data-view="power" hidden>
+    <div class="phead"><div><div class="eyebrow" id="prEyebrow"></div><h2>Power Rankings</h2><p class="sub">Ranked by all-play record (how each team would do if it played everyone every week), blended with actual record.</p></div></div>
+    <div id="prList"></div>
+  </section>
+
+  <section class="view" data-view="records" hidden>
+    <div class="phead"><div><div class="eyebrow" id="recEyebrow"></div><h2>League Record Books</h2><p class="sub">Every champion, high and low since the league went to 12 teams in 2019. Pick a record book to look it up.</p></div></div>
+    <div class="finder">
+      <div class="cats" role="tablist" aria-label="Record books" id="cats"></div>
+      <div>
+        <select class="catsel" id="catsel" aria-label="Choose a record book"></select>
+        <div id="holder"></div>
+        <div class="filter"><p id="recNote"></p><label for="recTeam" id="recTeamLbl">Owner <select id="recTeam"></select></label></div>
+        <div class="panel" id="recPanel"><div class="tw"><table id="recTable"></table></div></div>
+        <div id="atBox" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" data-view="h2h" hidden>
+    <div class="phead"><div><div class="eyebrow">Since 2019</div><h2>Head-to-Head</h2><p class="sub">Every meeting between two owners, whatever their team was called that year.</p></div></div>
+    <div class="picker">
+      <label for="a">Owner<select id="a"></select></label>
+      <span class="x">vs</span>
+      <label for="b">Opponent<select id="b"></select></label>
+      <label for="gtype">Games<select id="gtype"><option value="all">All games</option><option value="R">Regular season</option><option value="PC">Postseason</option></select></label>
+    </div>
+    <div id="duel"></div>
+    <h3 style="margin-top:32px">Rivalry grid <span class="sub" style="text-transform:none;letter-spacing:0;font-weight:400">(current owners · row owner's record vs column owner)</span></h3>
+    <div class="panel"><div class="tw"><table class="matrix" id="matrix"></table></div></div>
+  </section>
+
+  <section class="view" data-view="rules" hidden>
+    <div class="phead"><div><div class="eyebrow">League constitution</div><h2>Rulebook</h2><p class="sub">Current rules, and every change voted in by the owners.</p></div></div>
+    <div class="rules" id="rulesGrid"></div>
+    <h3>Rule changes</h3>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+
+<footer><div class="in"><span>© Footballs &amp; Flagons Fantasy Football League</span><span class="upd" id="updated"></span></div></footer>
+<script src="app.js"></script>
+</body>
+</html>

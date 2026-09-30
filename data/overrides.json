@@ -1,0 +1,36 @@
+{
+  "_about": "Facts the ESPN data can't produce on its own. Edited by hand; the build reads this file. See data/league_notes.md.",
+  "first_season": 2019,
+  "owner_aliases": {
+    "Jeffrey Riley": "Jeff Riley",
+    "Michael Legrand": "Michael LeGrand",
+    "Nicholas Gobran": "Nick Gobran",
+    "Matt J": "Matt Jass",
+    "Rachel Ketz": "Rachel Leighton",
+    "Jarol Torres": "Jarol Torres"
+  },
+  "playoff_format": {
+    "2019": {"teams": 8, "seeding": "record"},
+    "2020": {"teams": 8, "seeding": "record"},
+    "2021": {"teams": 6, "seeding": "record"},
+    "2022+": {"teams": 6, "seeding": "sixth_seed_rule"}
+  },
+  "division_names": {},
+  "tropny_first_season": 2021,
+  "tropny_winners": {
+    "2021": "Jon Vogel",
+    "2022": "Nick Gobran",
+    "2023": "Jon Vogel",
+    "2024": "Ryan Joynes",
+    "2025": "Xavier Scott"
+  },
+  "placement_overrides": [
+    {
+      "season": 2022,
+      "place": 7,
+      "winner": "Nick Gobran",
+      "loser": "Jon Vogel",
+      "reason": "The Week 17 Bills–Bengals game was cancelled after Damar Hamlin's cardiac arrest. The league added Josh Allen's Week 18 score to Nick's Week 17 total, which gave Nick the 7th-place game and the Tropny."
+    }
+  ]
+}
