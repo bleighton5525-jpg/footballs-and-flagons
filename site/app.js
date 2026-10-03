@@ -86,7 +86,7 @@
     $("seasonEyebrow").textContent = `${C.year} season · through Week ${C.lastWeek} of ${C.regWeeks}`;
     $("seasonTable").innerHTML = `<thead><tr><th>Owner</th><th class="c">Seed</th><th class="l hide-sm">Div</th><th>W–L</th><th>PF</th><th class="hide-sm">PA</th><th class="hide-sm">Diff</th><th>Strk</th></tr></thead><tbody>${S.map((r, k) => `<tr><td><span class="tm"><span class="rk">${k + 1}</span>${crest(r.owner)}<span><b>${esc(r.owner)}</b><small>${esc(r.team)}</small></span></span></td><td class="c">${seedCell(r)}</td><td class="l hide-sm">${esc(r.div)}</td><td>${rec(r)}</td><td>${f1(r.pf)}</td><td class="hide-sm">${f1(r.pa)}</td><td class="hide-sm">${(r.pf >= r.pa ? "+" : "") + f1(r.pf - r.pa)}</td><td>${r.streak}</td></tr>`).join("")}</tbody>`;
 
-    const statusPill = r => r.seed <= 3 ? `<span class="pill p-div">Won ${esc(r.div)}${r.seed <= 2 ? " · Bye" : ""}</span>` : '<span class="pill p-in">In · Record</span>';
+    const statusPill = r => r.seed <= 3 ? `<span class="pill p-div">Leading ${esc(r.div)}${r.seed <= 2 ? " · Bye" : ""}</span>` : '<span class="pill p-in">In · Record</span>';
     const bubble = outside.slice(0, 3);
     $("poTop").innerHTML = `<thead><tr><th class="c">Seed</th><th class="l">Owner</th><th class="l hide-sm">Div</th><th>W–L</th><th>PF</th><th class="l">Status</th></tr></thead><tbody>
       ${top5.map(r => `<tr><td class="c">${seedCell(r)}</td><td class="l">${who(r.owner, r.team)}</td><td class="l hide-sm">${esc(r.div)}</td><td>${rec(r)}</td><td>${f1(r.pf)}</td><td class="l">${statusPill(r)}</td></tr>`).join("")}
