@@ -24,6 +24,15 @@
     "2024": "Ryan Joynes",
     "2025": "Xavier Scott"
   },
+  "score_adjustments": [
+    {
+      "season": 2022,
+      "week": 17,
+      "owner": "Nick Gobran",
+      "add": 21.76,
+      "reason": "Special ruling: the Week 17 Bills–Bengals game was cancelled after Damar Hamlin's cardiac arrest, so Josh Allen's Week 18 score (21.76) was added to Nick's total (102.30 → 124.06)."
+    }
+  ],
   "placement_overrides": [
     {
       "season": 2022,

@@ -58,6 +58,14 @@ def load_season(year):
              "bs": round(a["totalPoints"], 2) if a else None, "winner": None}
         if a and m["winner"] in ("HOME", "AWAY"):
             g["winner"] = g["a"] if m["winner"] == "HOME" else g["b"]
+        # league rulings that changed a final score (see data/overrides.json)
+        for adj in OV.get("score_adjustments", []):
+            if adj["season"] == year and adj["week"] == g["wk"] and adj["owner"] in (g["a"], g["b"]):
+                side = "as" if g["a"] == adj["owner"] else "bs"
+                g[side] = round(g[side] + adj["add"], 2)
+                g["note"] = adj["reason"]
+                if a:
+                    g["winner"] = g["a"] if g["as"] > g["bs"] else g["b"]
         games.append(g)
     status = d["status"]
     return {"year": year, "teams": teams, "games": games, "regWeeks": reg_weeks,
@@ -134,8 +142,8 @@ def place_game(season, rank, notes, place):
     g = max(post, key=lambda g: g["wk"])
     ws, ls = (g["as"], g["bs"]) if g["at"] == w else (g["bs"], g["as"])
     out = {"ws": ws, "ls": ls}
-    if "override" in n:
-        out["note"] = n["override"]
+    if g.get("note"):
+        out["note"], out["adjusted"] = g["note"], True
     return out
 
 
@@ -322,7 +330,7 @@ def main():
 
     # ----- head-to-head game log (completed matchups, byes excluded) -----
     h2h = [[g["y"], g["wk"], "R" if g["tier"] == "NONE" else "P" if g["tier"].startswith("WINNERS") else "C",
-            g["a"], g["as"], g["b"], g["bs"]]
+            g["a"], g["as"], g["b"], g["bs"]] + ([g["note"]] if g.get("note") else [])
            for y in years for g in seasons[y]["games"] if g["done"] and g["bt"] is not None]
 
     out = {

@@ -45,7 +45,7 @@
   $("heroIn").innerHTML = `
     <div>
       <div class="eyebrow">${wkLabel}</div>
-      <h1>Seven seasons of glory, grudges and bad waiver claims.</h1>
+      <h1>The Trojan War is Upon Us</h1>
       <p>The official hub of the Footballs &amp; Flagons Fantasy Football League. Standings, the playoff race, rivalries and every record since the league went to 12 teams.</p>
       <div class="ctas"><a class="btn" href="#season" data-tab="tab-po">Playoff picture</a><a class="btn ghost" href="#records">Record books</a></div>
     </div>
@@ -117,7 +117,7 @@
   $("recEyebrow").textContent = `${D.firstSeason} – ${D.completedThrough}`;
   const cell = (o, team) => `<td class="l">${who(o, team)}</td>`;
   const games13 = r => r.games && r.games < 14 ? '<span class="note-i" title="13-game regular season">13 G</span>' : "";
-  const gameScore = g => !g ? "—" : g.note && g.note.length > 40 ? `<span class="note-i" title="${esc(g.note)}">Special ruling</span>` : `${f2(g.ws)}–${f2(g.ls)}${g.note ? ` <span class="note-i" title="${esc(g.note)}">2 games</span>` : ""}`;
+  const gameScore = g => !g ? "—" : `${f2(g.ws)}–${f2(g.ls)}${g.note ? ` <span class="note-i" title="${esc(g.note)}">${g.adjusted ? "Special ruling" : "2 games"}</span>` : ""}`;
   const kindTag = x => x.kind === "Regular season" ? "" : ` <span class="note-i" title="${esc(x.kind)}">${x.kind === "Playoff bye" ? "Bye" : x.kind === "Playoffs" ? "PO" : "Cons."}</span>`;
   const books = [
     { id: "champs", grp: "Postseason", name: "League champions", note: "Championship game results, newest first.",
@@ -215,7 +215,7 @@
   $("a").innerHTML = opts; $("b").innerHTML = opts;
   $("a").value = active[0]; $("b").value = active[1];
   const meetings = (x, y, t) => D.games.filter(g => ((g[3] === x && g[5] === y) || (g[3] === y && g[5] === x)) && (t === "all" || t.includes(g[2])))
-    .map(g => g[3] === x ? { y: g[0], wk: g[1], t: g[2], me: g[4], op: g[6] } : { y: g[0], wk: g[1], t: g[2], me: g[6], op: g[4] });
+    .map(g => g[3] === x ? { y: g[0], wk: g[1], t: g[2], me: g[4], op: g[6], note: g[7] } : { y: g[0], wk: g[1], t: g[2], me: g[6], op: g[4], note: g[7] });
   const series = ms => ms.reduce((s, m) => { s[m.me > m.op ? "w" : m.me < m.op ? "l" : "t"]++; s.pf += m.me; s.pa += m.op; return s }, { w: 0, l: 0, t: 0, pf: 0, pa: 0 });
   const typeName = { R: "Regular season", P: "Playoffs", C: "Consolation" };
   function duelDraw() {
@@ -227,7 +227,7 @@
     const recent = [...ms].sort((a, b) => b.y - a.y || b.wk - a.wk);
     $("duel").innerHTML = `<div class="duel"><div><div class="big" style="color:${cx}">${s.w}</div><div class="nm">${esc(x)}</div></div><div class="mid">${plural(g, "meeting")}${s.t ? ` · ${plural(s.t, "tie")}` : ""}</div><div><div class="big" style="color:${cy}">${s.l}</div><div class="nm">${esc(y)}</div></div></div>
       <div class="bar2" role="img" aria-label="${s.w} wins to ${s.l}"><span style="width:${s.w / g * 100}%;background:${cx}"></span><span style="flex:1;background:${cy}"></span></div>
-      <div class="grid"><div class="panel"><h3>All meetings</h3><div class="tw" style="max-height:420px;overflow-y:auto"><table><thead><tr><th>Season</th><th class="l">Game</th><th>${esc(first(x))}</th><th>${esc(first(y))}</th><th>Result</th></tr></thead><tbody>${recent.map(m => `<tr><td>${m.y}</td><td class="l">${m.t === "R" ? "Week " + m.wk : typeName[m.t] + " · Wk " + m.wk}</td><td>${f2(m.me)}</td><td>${f2(m.op)}</td><td class="${m.me > m.op ? "up" : m.me < m.op ? "dn" : "eq"}">${m.me > m.op ? "W" : m.me < m.op ? "L" : "T"}</td></tr>`).join("")}</tbody></table></div></div>
+      <div class="grid"><div class="panel"><h3>All meetings</h3><div class="tw" style="max-height:420px;overflow-y:auto"><table><thead><tr><th>Season</th><th class="l">Game</th><th>${esc(first(x))}</th><th>${esc(first(y))}</th><th>Result</th></tr></thead><tbody>${recent.map(m => `<tr><td>${m.y}</td><td class="l">${m.t === "R" ? "Week " + m.wk : typeName[m.t] + " · Wk " + m.wk}${m.note ? ` <span class="note-i" title="${esc(m.note)}">Special ruling</span>` : ""}</td><td>${f2(m.me)}</td><td>${f2(m.op)}</td><td class="${m.me > m.op ? "up" : m.me < m.op ? "dn" : "eq"}">${m.me > m.op ? "W" : m.me < m.op ? "L" : "T"}</td></tr>`).join("")}</tbody></table></div></div>
       <div class="panel"><h3>Series totals</h3><div class="pad"><dl style="display:grid;grid-template-columns:1fr auto;gap:8px;margin:0;font-variant-numeric:tabular-nums">
         <dt>${esc(first(x))} points</dt><dd style="margin:0">${f2(s.pf)}</dd><dt>${esc(first(y))} points</dt><dd style="margin:0">${f2(s.pa)}</dd>
         <dt>Avg margin (${esc(first(x))})</dt><dd style="margin:0">${((s.pf - s.pa) / g > 0 ? "+" : "") + ((s.pf - s.pa) / g).toFixed(2)}</dd>
