@@ -56,5 +56,22 @@
       ["chg", "League expands from 8 teams to 12, in three divisions. Record books start here."]
     ]}
   ],
-  "powerNotes": {}
+  "powerNotes": {},
+  "_siteUpdates": "Patch notes, newest first. Version = v[season].[week the update ships for]; add .1, .2 for same-week fixes; v[season].0 for offseason work. Nicknames are optional, for notable updates.",
+  "siteUpdates": [
+    {"version": "v26.6", "name": "Oracle", "date": "2026-10-13", "items": [
+      ["add", "Matchup of the Week banner on the Home page: projected scores, projected win chance and the all-time series for the week's top matchup."],
+      ["chg", "Power rankings now blend all-play record (35%), rest-of-season projection (30%), last-3-week average (10%) and win % (25%)."],
+      ["add", "Upcoming matchups show team names alongside records."],
+      ["add", "Asterisk on Wilson's 43.90 in the 2022 championship, played the week the Bills–Bengals game was cancelled."]
+    ]},
+    {"version": "v26.4.1", "date": "2026-10-03", "items": [
+      ["chg", "Home page headline: \"The Trojan War is Upon Us\"."],
+      ["chg", "2022 Week 17: Josh Allen's Week 18 score added to Nick's total under the Damar Hamlin ruling, so Nick beats Jon 124.06–121.70."],
+      ["chg", "Division leaders are labelled \"Leading\" in the Playoff Picture."]
+    ]},
+    {"version": "v26.4", "name": "Launch", "date": "2026-09-29", "items": [
+      ["add", "Site launch: standings, playoff picture, power rankings, record books, head-to-head and rulebook, with weekly updates from ESPN every Tuesday."]
+    ]}
+  ]
 }

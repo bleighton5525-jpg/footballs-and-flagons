@@ -294,6 +294,8 @@
     <div class="panel"><h3>Trophies</h3><div class="pad">${dl(CT.trophies)}</div></div>
     <div class="panel"><h3>Payouts · ${esc(CT.payouts.buyIn)} buy-in</h3><div class="pad">${dl(CT.payouts.rows)}<p class="fn" style="margin-top:10px">${esc(CT.payouts.note)}</p></div></div>
     <div class="panel wide"><h3>Choosing draft slots</h3><div class="pad">${CT.draftOrder.map(p => `<p>${esc(p)}</p>`).join("")}</div></div>`;
+  const fmtDate = s => new Date(s + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  $("siteLog").innerHTML = (CT.siteUpdates || []).map(u => `<div class="season"><h4>${esc(u.version)}${u.name ? ` <span style="color:var(--gold-d)">“${esc(u.name)}”</span>` : ""}</h4><p class="vote">${fmtDate(u.date)}</p><ul>${u.items.map(c => `<li><span class="pill ${lab[c[0]][0]}">${lab[c[0]][1]}</span><span>${esc(c[1])}</span></li>`).join("")}</ul></div>`).join("");
   $("log").innerHTML = CT.changelog.map(s => `<div class="season"><h4>${esc(s.label)}</h4><ul>${s.items.map(c => `<li><span class="pill ${lab[c[0]][0]}">${lab[c[0]][1]}</span><span>${esc(c[1])}</span></li>`).join("")}</ul></div>`).join("");
 
   /* ---------- routing ---------- */
