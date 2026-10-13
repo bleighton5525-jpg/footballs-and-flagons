@@ -4,7 +4,7 @@ name: Update and publish site
 
 on:
   schedule:
-    - cron: "0 12 * * 2"   # Tuesdays 12:00 UTC (7 a.m. Central)
+    - cron: "0 10 * * 2"   # Tuesdays 10:00 UTC: 5 a.m. Central (CDT), 4 a.m. after clocks fall back
   push:
     branches: [main]
   workflow_dispatch:
