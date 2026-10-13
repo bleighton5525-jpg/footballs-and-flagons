@@ -77,6 +77,46 @@
     const p1 = C.power[0];
     $("homePR").innerHTML = `${who(p1.owner, p1.team)}<p style="margin:10px 0 14px">${esc(CT.powerNotes[p1.owner] || `${p1.w}–${p1.l} with a ${p1.apW}–${p1.apL} all-play record and ${f1(p1.pf)} points.`)}</p><a class="btn" href="#power">Full rankings</a>`;
   }
+  /* ---------- matchup of the week (banner under the main banner) ---------- */
+  const M = C && C.motw;
+  if (M) {
+    const sA = S.find(r => r.owner === M.a), sB = S.find(r => r.owner === M.b);
+    const pA = C.power.find(p => p.owner === M.a), pB = C.power.find(p => p.owner === M.b);
+    const games = D.games.filter(g => (g[3] === M.a && g[5] === M.b) || (g[3] === M.b && g[5] === M.a))
+      .map(g => g[3] === M.a ? { y: g[0], wk: g[1], t: g[2], a: g[4], b: g[6] } : { y: g[0], wk: g[1], t: g[2], a: g[6], b: g[4] })
+      .sort((x, y) => x.y - y.y || x.wk - y.wk);
+    const wA = games.filter(g => g.a > g.b).length, wB = games.filter(g => g.b > g.a).length;
+    const ptsA = games.reduce((s, g) => s + g.a, 0), ptsB = games.reduce((s, g) => s + g.b, 0);
+    const post = games.filter(g => g.t !== "R"), postA = post.filter(g => g.a > g.b).length, postB = post.filter(g => g.b > g.a).length;
+    const pair = r => [r.owner, r.ru].sort().join("|") === [M.a, M.b].sort().join("|");
+    const gameName = g => {
+      const lastOfYear = !games.some(x => x.y === g.y && x.t === g.t && x.wk > g.wk);
+      if (g.t === "P" && lastOfYear && R.champions.some(r => r.y === g.y && pair(r))) return `${g.y} Championship`;
+      if (g.t === "C" && lastOfYear && R.tropny.some(r => r.y === g.y && pair(r))) return `${g.y} Tropny final`;
+      return g.t === "R" ? `Week ${g.wk}, ${g.y}` : `${g.y} ${g.t === "P" ? "Playoffs" : "Consolation"}, Wk ${g.wk}`;
+    };
+    const last = games[games.length - 1];
+    const margin = games.length ? (ptsA - ptsB) / games.length : 0;
+    const side = (s, r) => `<div class="side${r ? " r" : ""}">${crest(s.owner)}<div class="who"><div class="nm">${esc(s.owner)}</div><div class="tmn">${esc(s.team)}</div>
+      <div class="rec">${rec(s)}${s.seed ? ` · Seed ${s.seed}` : ""} · ${esc(s.div)}</div></div></div>`;
+    const cA = O[M.a].color, cB = O[M.b].color, fA = first(M.a), fB = first(M.b);
+    $("motw").innerHTML = `<div class="in">
+      <div class="top"><div class="eyebrow" id="motw-lbl">Matchup of the Week · Week ${M.wk}</div>
+        <div class="why">Best combined all-play record this week · <b>${pA.apW + pB.apW}–${pA.apL + pB.apL}</b></div></div>
+      <div class="vs">${side(sA)}
+        <div class="proj"><div class="lbl">Projected score</div>${M.projA != null ? `<div class="sc">${f1(M.projA)}<span>VS</span>${f1(M.projB)}</div>` : '<div class="sc">—</div>'}</div>
+        ${side(sB, true)}</div>
+      ${M.winA != null ? `<div class="edge" role="img" aria-label="Projected win chance: ${esc(fA)} ${Math.round(M.winA * 100)}%, ${esc(fB)} ${100 - Math.round(M.winA * 100)}%"><i style="width:${M.winA * 100}%;background:${cA}"></i><i style="flex:1;background:${cB}"></i></div>
+      <div class="edge-lbl"><span>${esc(fA)} ${Math.round(M.winA * 100)}%</span><span>Projected win chance</span><span>${100 - Math.round(M.winA * 100)}% ${esc(fB)}</span></div>` : ""}
+      <div class="series"><div class="lbl">All-time series</div>
+        ${games.length ? `<div class="tally" role="img" aria-label="${esc(fA)} ${wA}, ${esc(fB)} ${wB}"><span class="n" style="color:${cA}">${wA}</span><div class="tbar"><i style="width:${wA / (wA + wB || 1) * 100}%;background:${cA}"></i><i style="flex:1;background:${cB}"></i></div><span class="n" style="color:${cB}">${wB}</span></div>
+        <div class="facts"><span><em>Points</em>${f2(ptsA)}–${f2(ptsB)}</span><span><em>Avg margin</em>${margin >= 0 ? esc(fA) : esc(fB)} +${f2(Math.abs(margin))}</span>
+          <span><em>Postseason</em>${post.length ? `${postA}–${postB}` : "None"}</span>
+          <span><em>Last</em>${gameName(last)}, ${last.a > last.b ? `${esc(fA)} ${f2(last.a)}–${f2(last.b)}` : `${esc(fB)} ${f2(last.b)}–${f2(last.a)}`}</span></div>`
+        : `<div class="facts" style="justify-content:flex-start"><span>First ever meeting</span></div><div></div>`}
+      </div></div>`;
+  }
+
   const latest = CT.changelog[0];
   const lab = { add: ["p-add", "Added"], chg: ["p-chg", "Changed"], rem: ["p-rem", "Removed"] };
   $("homeRule").innerHTML = `<p class="sub" style="margin:0 0 10px;font-size:13px">${esc(latest.label)}</p>${latest.items.slice(0, 3).map(i => `<p style="margin:0 0 10px"><span class="pill ${lab[i[0]][0]}">${lab[i[0]][1]}</span> ${esc(i[1])}</p>`).join("")}<p style="margin:14px 0 0"><a class="btn" href="#rules">Open rulebook</a></p>`;
@@ -261,7 +301,7 @@
   function go() {
     const id = (location.hash || "#home").slice(1), v = views.some(x => x.dataset.view === id) ? id : "home";
     views.forEach(x => x.hidden = x.dataset.view !== v); links.forEach(l => l.toggleAttribute("aria-current", l.hash === "#" + v));
-    $("hero").hidden = v !== "home"; $("nav").classList.remove("open"); $("menuBtn").setAttribute("aria-expanded", "false"); window.scrollTo(0, 0);
+    $("hero").hidden = v !== "home"; $("motw").hidden = v !== "home" || !M; $("nav").classList.remove("open"); $("menuBtn").setAttribute("aria-expanded", "false"); window.scrollTo(0, 0);
   }
   addEventListener("hashchange", go); go();
   $("menuBtn").onclick = () => { const o = $("nav").classList.toggle("open"); $("menuBtn").setAttribute("aria-expanded", o) };

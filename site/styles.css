@@ -226,3 +226,45 @@ footer .in{max-width:1180px;margin:0 auto;padding:24px 16px;display:flex;justify
 .rules p{margin:0 0 8px;font-size:14px}
 .filterrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 12px}
 .filterrow label{display:flex;gap:8px;align-items:center;font:700 12px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* Matchup of the Week banner (Home page, under the main banner) */
+.motw{background:#f7f4ee;color:var(--ink);border-top:3px solid var(--gold);border-bottom:1px solid var(--line)}
+.motw .in{max-width:1180px;margin:0 auto;padding:18px 16px 0}
+.motw .eyebrow{color:var(--gold-d)}
+.motw .top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px}
+.motw .why{font:700 11px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.motw .why b{color:var(--ink)}
+.motw .vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:20px;align-items:center;padding:16px 0 14px}
+.motw .side{display:flex;align-items:center;gap:12px;min-width:0}
+.motw .side.r{flex-direction:row-reverse;text-align:right}
+.motw .crest{width:42px;height:42px;font-size:14px}
+.motw .who{min-width:0}
+.motw .nm{font:700 19px/1.2 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.motw .tmn{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.motw .rec{font:700 12px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--gold-d);margin-top:2px;white-space:nowrap}
+.motw .proj{text-align:center}
+.motw .lbl{font:700 10px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.motw .sc{font:700 clamp(28px,4.2vw,38px)/1.05 var(--ui);font-variant-numeric:tabular-nums;white-space:nowrap;margin-top:4px}
+.motw .sc span{color:#b5b0a6;font-size:.5em;margin:0 10px;vertical-align:middle;letter-spacing:.1em}
+.motw .edge{height:6px;border-radius:3px;overflow:hidden;display:flex;background:#e3e0da}
+.motw .edge i,.motw .tally .tbar i{display:block;height:100%}
+.motw .edge-lbl{display:flex;justify-content:space-between;padding:5px 0 14px;font:700 11px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.motw .series{border-top:1px solid var(--line);display:grid;grid-template-columns:auto minmax(160px,320px) auto;gap:10px 22px;align-items:center;padding:12px 0 14px;font-variant-numeric:tabular-nums}
+.motw .series .lbl{font-size:11px;color:var(--gold-d)}
+.motw .tally{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.motw .tally .n{font:800 22px/1 var(--display)}
+.motw .tally .tbar{height:6px;border-radius:3px;overflow:hidden;display:flex;background:#e3e0da}
+.motw .facts{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;justify-content:flex-end}
+.motw .facts span{white-space:nowrap}
+.motw .facts em{font-style:normal;color:var(--muted);margin-right:4px}
+@media (max-width:860px){.motw .series{grid-template-columns:minmax(0,1fr)}.motw .facts{justify-content:flex-start}}
+@media (max-width:560px){
+  .motw .vs{grid-template-columns:minmax(0,1fr) minmax(0,1fr);row-gap:14px}
+  .motw .proj{grid-column:1/-1;order:3}
+  .motw .side,.motw .side.r{gap:10px}
+  .motw .crest{width:36px;height:36px;font-size:12px}
+  .motw .nm{font-size:16px}
+  .motw .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+  .motw .facts span{display:contents}
+  .motw .facts em{margin:0}
+}

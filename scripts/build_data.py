@@ -5,6 +5,7 @@ Reads:  data/raw/<year>.json (from fetch_espn.py), data/overrides.json, data/con
 League rules applied here are documented in data/league_notes.md.
 """
 import json
+import math
 import re
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -209,6 +210,31 @@ def rest_of_season(proj, after_week, reg_weeks):
     return out
 
 
+def matchup_of_the_week(season, power, proj, week):
+    """The upcoming game whose two teams have the best combined all-play record, with projections."""
+    ap = {p["tid"]: p for p in power}
+    games = [g for g in season["games"] if g["wk"] == week and g["tier"] == "NONE" and g["bt"] is not None]
+    if not games:
+        return None
+    g = max(games, key=lambda g: (ap[g["at"]]["apW"] + ap[g["bt"]]["apW"], ap[g["at"]]["score"] + ap[g["bt"]]["score"]))
+    out = {"wk": week, "a": g["a"], "b": g["b"]}
+    if proj and all(str(t) in proj["teams"] for t in (g["at"], g["bt"])):
+        set_lineups = proj["currentWeek"] == week  # lineups in the file were set for this week
+        slot_counts = {int(k): v for k, v in proj["lineupSlotCounts"].items() if int(k) not in (20, 21)}
+
+        def projected(tid):
+            players = proj["teams"][str(tid)]
+            if set_lineups:
+                return sum(p["proj"].get(str(week), 0) for p in players.values() if p["slot"] not in (20, 21))
+            return best_lineup_points({k: p for k, p in players.items() if p["slot"] != 21}, week, slot_counts)
+
+        pa, pb = projected(g["at"]), projected(g["bt"])
+        # win chance: each team's score varies ~25 points around its projection
+        win_a = 0.5 * (1 + math.erf((pa - pb) / (25 * math.sqrt(2)) / math.sqrt(2)))
+        out.update({"projA": round(pa, 2), "projB": round(pb, 2), "winA": round(win_a, 3), "lineupsSet": set_lineups})
+    return out
+
+
 def power_rankings(season, rec, through, ros=None):
     """Blend of all-play record, rest-of-season projection, last-3-week average and win %."""
     scores = weekly_scores(season, through)
@@ -393,6 +419,7 @@ def main():
             "year": current, "lastWeek": last_week, "nextWeek": last_week + 1, "regWeeks": cur["regWeeks"],
             "seeding": rule, "divisions": sorted({t["div"] for t in teams.values()}),
             "powerWeights": POWER_WEIGHTS, "projWeeks": [last_week + 1, cur["regWeeks"]] if ros else None,
+            "motw": matchup_of_the_week(cur, pr_now, proj, last_week + 1) if last_week < cur["regWeeks"] else None,
             "standings": standings,
             "lastResults": week_games(last_week) if last_week else [],
             "upcoming": week_games(last_week + 1) if last_week < cur["regWeeks"] else [],

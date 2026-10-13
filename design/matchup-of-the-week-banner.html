@@ -1,0 +1,125 @@
+<title>Matchup of the Week Banner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Roboto+Condensed:wght@500;700&family=Roboto:wght@400;500;700&display=swap">
+<style>
+:root{
+  --nav:#1c1d21; --nav2:#26272c; --navtext:#e9e6df; --page:#ffffff; --band:#f4f2ee;
+  --ink:#1f1f22; --muted:#5f5d58; --line:#e3e0da; --gold:#c9a13b; --gold-d:#a7832a;
+  --x:#2d4a6e; --xl:#5b84b5; --m:#6b4e16; --ml:#b08a3a;
+  --display:"Cinzel",Georgia,serif; --ui:"Roboto Condensed","Arial Narrow",sans-serif; --body:"Roboto",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+.note{background:#faf3df;border-bottom:1px solid #ead9a8;font-size:13px;color:#5c4a12;padding:10px 16px;text-align:center}
+.in{max-width:1180px;margin:0 auto;padding-inline:16px}
+.eyebrow{font:700 12px/1 var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+
+/* context: site header + existing hero (shortened) */
+header{background:var(--nav);color:var(--navtext);border-bottom:3px solid var(--gold)}
+header .in{height:56px;display:flex;align-items:center}
+header b{font:800 17px var(--display)}
+.hero{background:linear-gradient(180deg,var(--nav2),#15161a);color:var(--navtext)}
+.hero .in{padding-block:32px 34px}
+.hero h1{font:800 clamp(26px,4vw,40px)/1.1 var(--display);margin:10px 0 0}
+
+/* the banner */
+.motw{background:#f7f4ee;color:var(--ink);border-top:3px solid var(--gold);border-bottom:1px solid var(--line)}
+.motw .in{padding-block:18px 0}
+.motw .eyebrow{color:var(--gold-d)}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px}
+.why{font:700 11px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.why b{color:var(--ink);font-weight:700}
+
+.vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:20px;align-items:center;padding-block:16px 14px}
+.side{display:flex;align-items:center;gap:12px;min-width:0}
+.side.r{flex-direction:row-reverse;text-align:right}
+.crest{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:700 14px var(--ui);color:#fff;flex:none}
+.who{min-width:0}
+.nm{font:700 19px/1.2 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec{font:700 12px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--gold-d);margin-top:2px;white-space:nowrap}
+.proj{text-align:center}
+.proj .lbl{font:700 10px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.proj .sc{font:700 clamp(28px,4.2vw,38px)/1.05 var(--ui);font-variant-numeric:tabular-nums;white-space:nowrap;margin-top:4px}
+.proj .sc span{color:#b5b0a6;font-size:.5em;margin:0 10px;vertical-align:middle;letter-spacing:.1em}
+
+.edge{height:6px;border-radius:3px;overflow:hidden;display:flex;background:#e3e0da}
+.edge i{display:block;height:100%}
+.edge-lbl{display:flex;justify-content:space-between;padding:5px 0 14px;font:700 11px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+.series{border-top:1px solid var(--line);display:grid;grid-template-columns:auto minmax(160px,320px) auto;gap:10px 22px;align-items:center;padding-block:12px 14px;font-variant-numeric:tabular-nums}
+.series .lbl{font:700 11px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-d)}
+.tally{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.tally .n{font:800 22px/1 var(--display)}
+.tally .bar{height:6px;border-radius:3px;overflow:hidden;display:flex}
+.tally .bar i{display:block;height:100%}
+.facts{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;color:var(--ink);justify-content:flex-end}
+.facts span{white-space:nowrap}
+.facts em{font-style:normal;color:var(--muted);margin-right:4px}
+
+/* page continues */
+.rest{padding-block:24px;color:var(--muted);font-size:14px}
+.ghost{border:1px dashed var(--line);border-radius:6px;padding:28px;text-align:center}
+
+@media (max-width:860px){
+  .series{grid-template-columns:minmax(0,1fr)}
+  .facts{justify-content:flex-start}
+}
+@media (max-width:560px){
+  .vs{grid-template-columns:minmax(0,1fr) minmax(0,1fr);row-gap:14px}
+  .proj{grid-column:1/-1;order:3}
+  .side,.side.r{gap:10px}
+  .crest{width:36px;height:36px;font-size:12px}
+  .nm{font-size:16px}
+  .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+  .facts span{display:contents}
+  .facts em{margin:0}
+}
+</style>
+
+<div class="note">Mockup · Condensed Matchup of the Week banner, built with real Week 5 data. It sits directly under the main banner on the Home page.</div>
+<header><div class="in"><b>Footballs &amp; Flagons</b></div></header>
+<section class="hero"><div class="in"><div class="eyebrow">2026 Season · Through Week 4</div><h1>The Trojan War is Upon Us</h1></div></section>
+
+<section class="motw" aria-labelledby="motw-lbl">
+  <div class="in">
+    <div class="top">
+      <div class="eyebrow" id="motw-lbl">Matchup of the Week · Week 5</div>
+      <div class="why">Best combined all-play record this week · <b>52–36</b></div>
+    </div>
+
+    <div class="vs">
+      <div class="side">
+        <span class="crest" style="background:var(--x)">XS</span>
+        <div class="who"><div class="nm">Xavier Scott</div><div class="tm">Achillies Heel</div><div class="rec">4–0 · Seed 1 · Trojans</div></div>
+      </div>
+      <div class="proj">
+        <div class="lbl">Projected score</div>
+        <div class="sc">102.0<span>VS</span>106.3</div>
+      </div>
+      <div class="side r">
+        <span class="crest" style="background:var(--m)">MJ</span>
+        <div class="who"><div class="nm">Matt Jass</div><div class="tm">Eggbuka in my Dionysjass</div><div class="rec">3–1 · Seed 5 · Gods</div></div>
+      </div>
+    </div>
+
+    <div class="edge" role="img" aria-label="Projected win chance: Xavier 45%, Matt 55%"><i style="width:45%;background:var(--x)"></i><i style="flex:1;background:var(--m)"></i></div>
+    <div class="edge-lbl"><span>Xavier 45%</span><span>Projected win chance</span><span>55% Matt</span></div>
+
+    <div class="series">
+      <div class="lbl">All-time series</div>
+      <div class="tally" role="img" aria-label="Xavier leads the series 5 to 3">
+        <span class="n" style="color:var(--x)">5</span>
+        <div class="bar"><i style="width:62.5%;background:var(--x)"></i><i style="flex:1;background:var(--m)"></i></div>
+        <span class="n" style="color:var(--m)">3</span>
+      </div>
+      <div class="facts">
+        <span><em>Points</em>779.36–735.26</span>
+        <span><em>Avg margin</em>Xavier +5.51</span>
+        <span><em>Postseason</em>1–1</span>
+        <span><em>Last</em>2025 Tropny final, Xavier 89.76–81.64</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="in rest"><div class="ghost">Rest of the Home page (this week's matchups, last week's results, playoff picture…)</div></div>
