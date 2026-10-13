@@ -33,6 +33,14 @@
       "reason": "Special ruling: the Week 17 Bills–Bengals game was cancelled after Damar Hamlin's cardiac arrest, so Josh Allen's Week 18 score (21.76) was added to Nick's total (102.30 → 124.06)."
     }
   ],
+  "score_notes": [
+    {
+      "season": 2022,
+      "week": 17,
+      "owner": "Wilson Kozel",
+      "note": "2022 championship game: the Bills–Bengals game was cancelled after Damar Hamlin's cardiac arrest, so several of Wilson's starters never played."
+    }
+  ],
   "placement_overrides": [
     {
       "season": 2022,

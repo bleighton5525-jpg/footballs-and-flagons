@@ -166,32 +166,87 @@ def seed_teams(season, rec, rule):
     return seeds
 
 
-def power_rankings(season, rec, through):
-    """All-play record (each week vs every other team) blended with actual win %."""
+# Power ranking formula, agreed by the league in October 2026. Projection and recent form are
+# scaled 0–1 between the league's worst and best team; all-play and win % are already 0–1.
+POWER_WEIGHTS = {"allPlay": 0.35, "projection": 0.30, "last3": 0.10, "winPct": 0.25}
+
+
+def weekly_scores(season, through):
     scores = defaultdict(dict)
     for g in season["games"]:
         if g["tier"] == "NONE" and g["done"] and g["bt"] is not None and g["wk"] <= through:
             scores[g["wk"]][g["at"]] = g["as"]
             scores[g["wk"]][g["bt"]] = g["bs"]
+    return scores
+
+
+def best_lineup_points(players, week, slot_counts):
+    """Projected points for the best possible starting lineup in a week (bench and IR excluded)."""
+    flex = {3, 5, 7, 23}  # RB/WR, WR/TE, OP, FLEX: fill these after the fixed positions
+    used, total = set(), 0.0
+    for slot in sorted(slot_counts, key=lambda s: (s in flex, s)):
+        for _ in range(slot_counts[slot]):
+            options = [pid for pid, p in players.items() if pid not in used and slot in p["elig"]]
+            if options:
+                pick = max(options, key=lambda pid: players[pid]["proj"].get(str(week), 0))
+                used.add(pick)
+                total += players[pick]["proj"].get(str(week), 0)
+    return total
+
+
+def rest_of_season(proj, after_week, reg_weeks):
+    """Average projected points per week over the rest of the regular season, per team id."""
+    if not proj:
+        return {}
+    slot_counts = {int(k): v for k, v in proj["lineupSlotCounts"].items() if int(k) not in (20, 21)}
+    weeks = range(after_week + 1, reg_weeks + 1)
+    if not weeks:
+        return {}
+    out = {}
+    for tid, players in proj["teams"].items():
+        active = {pid: p for pid, p in players.items() if p["slot"] != 21}  # skip IR
+        out[int(tid)] = sum(best_lineup_points(active, w, slot_counts) for w in weeks) / len(weeks)
+    return out
+
+
+def power_rankings(season, rec, through, ros=None):
+    """Blend of all-play record, rest-of-season projection, last-3-week average and win %."""
+    scores = weekly_scores(season, through)
     ap = {tid: [0, 0] for tid in season["teams"]}
     for wk, s in scores.items():
         for t, v in s.items():
             for u, x in s.items():
                 if t != u:
                     ap[t][0 if v > x else 1] += 1 if v != x else 0.5
+    recent = sorted(scores)[-3:]
+    last3 = {tid: sum(scores[w].get(tid, 0) for w in recent) / len(recent) if recent else 0 for tid in season["teams"]}
+
+    def scaled(values):
+        lo, hi = min(values.values()), max(values.values())
+        return {k: (v - lo) / (hi - lo) if hi > lo else 0.5 for k, v in values.items()}
+
+    weights = dict(POWER_WEIGHTS)
+    ros = ros or {}
+    if len(ros) != len(season["teams"]):  # no projections available: share their weight out
+        weights.pop("projection")
+    total = sum(weights.values())
+    ros_s, last3_s = (scaled(ros) if "projection" in weights else {}), scaled(last3)
     out = []
     for tid in season["teams"]:
         w, l = ap[tid]
         games = rec[tid]["w"] + rec[tid]["l"] + rec[tid]["t"]
-        ap_pct = w / (w + l) if w + l else 0
-        win_pct = (rec[tid]["w"] + 0.5 * rec[tid]["t"]) / games if games else 0
-        out.append({"tid": tid, "apW": w, "apL": l, "score": round(0.65 * ap_pct + 0.35 * win_pct, 4)})
+        parts = {"allPlay": w / (w + l) if w + l else 0,
+                 "winPct": (rec[tid]["w"] + 0.5 * rec[tid]["t"]) / games if games else 0,
+                 "last3": last3_s[tid], "projection": ros_s.get(tid, 0)}
+        score = sum(weights[k] * parts[k] for k in weights) / total
+        out.append({"tid": tid, "apW": w, "apL": l, "score": round(score, 4),
+                    "last3": round(last3[tid], 2), "ros": round(ros[tid], 2) if tid in ros else None})
     out.sort(key=lambda x: (-x["score"], -rec[x["tid"]]["pf"]))
     return out
 
 
 def main():
-    years = sorted(int(p.stem) for p in RAW.glob("*.json") if int(p.stem) >= FIRST)
+    years = sorted(int(p.stem) for p in RAW.glob("*.json") if p.stem.isdigit() and int(p.stem) >= FIRST)
     seasons = {y: load_season(y) for y in years}
     current = max(years)
     cur = seasons[current]
@@ -273,7 +328,12 @@ def main():
             for me, tid, v, opp in ((g["a"], g["at"], g["as"], g["b"]), (g["b"], g["bt"], g["bs"], g["a"])):
                 if me is None or (kind != "Playoff bye" and v == 0):
                     continue
-                scores.append({"owner": me, "team": s["teams"][tid]["team"], "y": y, "wk": g["wk"], "v": v, "opp": opp, "kind": kind})
+                row = {"owner": me, "team": s["teams"][tid]["team"], "y": y, "wk": g["wk"], "v": v, "opp": opp, "kind": kind}
+                note = next((n["note"] for n in OV.get("score_notes", [])
+                             if (n["season"], n["week"], n["owner"]) == (y, g["wk"], me)), None)
+                if note:
+                    row["note"] = note
+                scores.append(row)
     real = [x for x in scores if x["kind"] != "Playoff bye"]
     records = {
         "champions": sorted(rec_champ, key=lambda x: -x["y"]),
@@ -302,12 +362,25 @@ def main():
         last_week = done_weeks[-1] if done_weeks else 0
         rule = playoff_format(current)["seeding"]
         seeds = seed_teams(cur, rec, rule)
-        pr_now = power_rankings(cur, rec, last_week)
-        prev_rank = {}
-        if last_week > 1:
-            prev = power_rankings(cur, reg_records(cur, last_week - 1), last_week - 1)
-            prev_rank = {x["tid"]: i + 1 for i, x in enumerate(prev)}
+        proj_file = RAW / f"{current}_projections.json"
+        proj = json.loads(proj_file.read_text()) if proj_file.exists() else None
+        ros = rest_of_season(proj, last_week, cur["regWeeks"])
+        pr_now = power_rankings(cur, rec, last_week, ros)
         teams = cur["teams"]
+        # movement compares with last week's published ranking (saved because projections can't be recreated later)
+        hist_file = ROOT / "data" / "power_history.json"
+        hist = json.loads(hist_file.read_text()) if hist_file.exists() else {}
+        hist.setdefault(str(current), {})[str(last_week)] = [teams[x["tid"]]["owner"] for x in pr_now]
+        hist_file.write_text(json.dumps(hist, indent=1))
+        prev_order = hist[str(current)].get(str(last_week - 1))
+        if prev_order:
+            prev_rank = {tid: prev_order.index(t["owner"]) + 1 for tid, t in teams.items() if t["owner"] in prev_order}
+        elif last_week > 1:
+            # no saved ranking yet: rebuild last week's using this week's projections as the best stand-in
+            prev = power_rankings(cur, reg_records(cur, last_week - 1), last_week - 1, ros)
+            prev_rank = {x["tid"]: i + 1 for i, x in enumerate(prev)}
+        else:
+            prev_rank = {}
         standings = []
         for tid in sorted(teams, key=by_record(rec)):
             r = rec[tid]
@@ -319,12 +392,14 @@ def main():
         cs = {
             "year": current, "lastWeek": last_week, "nextWeek": last_week + 1, "regWeeks": cur["regWeeks"],
             "seeding": rule, "divisions": sorted({t["div"] for t in teams.values()}),
+            "powerWeights": POWER_WEIGHTS, "projWeeks": [last_week + 1, cur["regWeeks"]] if ros else None,
             "standings": standings,
             "lastResults": week_games(last_week) if last_week else [],
             "upcoming": week_games(last_week + 1) if last_week < cur["regWeeks"] else [],
             "power": [{"owner": teams[x["tid"]]["owner"], "team": teams[x["tid"]]["team"], "apW": x["apW"], "apL": x["apL"],
                        "w": rec[x["tid"]]["w"], "l": rec[x["tid"]]["l"], "pf": rec[x["tid"]]["pf"],
-                       "move": (prev_rank[x["tid"]] - (i + 1)) if prev_rank else 0}
+                       "last3": x["last3"], "ros": x["ros"], "score": x["score"],
+                       "move": (prev_rank[x["tid"]] - (i + 1)) if x["tid"] in prev_rank else 0}
                       for i, x in enumerate(pr_now)],
         }
 

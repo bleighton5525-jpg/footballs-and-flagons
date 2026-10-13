@@ -59,9 +59,9 @@
 
   /* ---------- home ---------- */
   const recOf = o => { const r = S.find(x => x.owner === o); return r ? rec(r) : "" };
-  const matchRow = (g, scores) => `<div class="match">${who(g.a, scores ? teamOf(g.a) : recOf(g.a))}
+  const matchRow = (g, scores) => `<div class="match">${who(g.a, scores ? teamOf(g.a) : `${teamOf(g.a)} · ${recOf(g.a)}`)}
     <span class="sc">${scores ? `${f2(g.as)}<br>${f2(g.bs)}` : '<span class="vs">vs</span>'}</span>
-    <span class="tm r"><span style="text-align:right"><b>${esc(g.b)}</b><small>${esc(scores ? teamOf(g.b) : recOf(g.b))}</small></span>${crest(g.b)}</span></div>`;
+    <span class="tm r"><span style="text-align:right"><b>${esc(g.b)}</b><small>${esc(scores ? teamOf(g.b) : `${teamOf(g.b)} · ${recOf(g.b)}`)}</small></span>${crest(g.b)}</span></div>`;
   if (C) {
     $("upTitle").textContent = C.upcoming.length ? `Week ${C.nextWeek} matchups` : "Regular season complete";
     $("upSub").textContent = C.upcoming.length ? "Records through last week" : "";
@@ -108,8 +108,11 @@
   /* ---------- power rankings ---------- */
   if (C) {
     $("prEyebrow").textContent = `Week ${C.lastWeek} edition · ${C.year}`;
+    const pw = C.powerWeights, pct = v => Math.round(v * 100) + "%";
+    $("prExplain").textContent = `Each team's score blends four things: all-play record (${pct(pw.allPlay)}), how its roster projects for the rest of the regular season (${pct(pw.projection)}), its average score over the last 3 weeks (${pct(pw.last3)}) and its actual win % (${pct(pw.winPct)}). ` +
+      (C.projWeeks ? `Projections use ESPN's weekly player projections for Weeks ${C.projWeeks[0]}–${C.projWeeks[1]}, starting each team's best possible lineup every week.` : "");
     $("prList").innerHTML = C.power.map((p, i) => `<div class="pr"><div class="n">${i + 1}</div><div>${who(p.owner, p.team)}
-      <div class="rec" style="margin-top:6px">${p.w}–${p.l} · all-play ${p.apW}–${p.apL} · ${f1(p.pf)} PF</div>${CT.powerNotes[p.owner] ? `<p>${esc(CT.powerNotes[p.owner])}</p>` : ""}</div>
+      <div class="rec" style="margin-top:6px">${p.w}–${p.l} · all-play ${p.apW}–${p.apL} · last 3 avg ${f1(p.last3)}${p.ros != null ? ` · projected ${f1(p.ros)}/wk` : ""}</div>${CT.powerNotes[p.owner] ? `<p>${esc(CT.powerNotes[p.owner])}</p>` : ""}</div>
       <div class="mv ${p.move > 0 ? "up" : p.move < 0 ? "dn" : "eq"}">${p.move > 0 ? "▲ " + p.move : p.move < 0 ? "▼ " + (-p.move) : "— 0"}</div></div>`).join("");
   }
 
@@ -118,6 +121,7 @@
   const cell = (o, team) => `<td class="l">${who(o, team)}</td>`;
   const games13 = r => r.games && r.games < 14 ? '<span class="note-i" title="13-game regular season">13 G</span>' : "";
   const gameScore = g => !g ? "—" : `${f2(g.ws)}–${f2(g.ls)}${g.note ? ` <span class="note-i" title="${esc(g.note)}">${g.adjusted ? "Special ruling" : "2 games"}</span>` : ""}`;
+  const star = r => r.note ? `<span title="${esc(r.note)}" style="cursor:help">*</span>` : "";
   const kindTag = x => x.kind === "Regular season" ? "" : ` <span class="note-i" title="${esc(x.kind)}">${x.kind === "Playoff bye" ? "Bye" : x.kind === "Playoffs" ? "PO" : "Cons."}</span>`;
   const books = [
     { id: "champs", grp: "Postseason", name: "League champions", note: "Championship game results, newest first.",
@@ -133,10 +137,10 @@
       head: ["#", "Owner", "Season", "W–L", "Points"], hideSm: [3], rows: R.hiSeason.map((r, i) => ({ o: [r.owner], h: `<td><span class="rk">${i + 1}</span></td>${cell(r.owner, r.team)}<td>${r.y}${games13(r)}</td><td class="hide-sm">${r.rec}</td><td class="pts">${f2(r.v)}</td>` })),
       hero: () => { const r = R.hiSeason[0]; return { l: "Record", nm: r.owner, meta: `${r.team} · ${r.y} · ${r.rec}`, v: f2(r.v), u: "Points" } } },
     { id: "hiGame", grp: "Scoring highs", name: "Most points in a game", note: "Every game counts, including the postseason and scores posted during a playoff bye.",
-      head: ["#", "Owner", "Season", "Week", "Opponent", "Points"], hideSm: [4], rows: R.hiGame.map((r, i) => ({ o: [r.owner, r.opp], h: `<td><span class="rk">${i + 1}</span></td>${cell(r.owner, r.team)}<td>${r.y}</td><td>${r.wk}${kindTag(r)}</td><td class="l hide-sm">${esc(r.opp || "—")}</td><td class="pts">${f2(r.v)}</td>` })),
+      head: ["#", "Owner", "Season", "Week", "Opponent", "Points"], hideSm: [4], rows: R.hiGame.map((r, i) => ({ note: r.note, o: [r.owner, r.opp], h: `<td><span class="rk">${i + 1}</span></td>${cell(r.owner, r.team)}<td>${r.y}</td><td>${r.wk}${kindTag(r)}</td><td class="l hide-sm">${esc(r.opp || "—")}</td><td class="pts">${f2(r.v)}${star(r)}</td>` })),
       hero: () => { const r = R.hiGame[0]; return { l: "Record", nm: r.owner, meta: `${r.team} · Week ${r.wk}, ${r.y}${r.opp ? " vs " + r.opp : ""}`, v: f2(r.v), u: "Points" } } },
     { id: "loGame", grp: "Scoring lows", name: "Fewest points in a game", note: "Lowest single-game scores, regular season and postseason.",
-      head: ["#", "Owner", "Season", "Week", "Opponent", "Points"], hideSm: [4], rows: R.loGame.map((r, i) => ({ o: [r.owner, r.opp], h: `<td><span class="rk">${i + 1}</span></td>${cell(r.owner, r.team)}<td>${r.y}</td><td>${r.wk}${kindTag(r)}</td><td class="l hide-sm">${esc(r.opp)}</td><td class="pts">${f2(r.v)}</td>` })),
+      head: ["#", "Owner", "Season", "Week", "Opponent", "Points"], hideSm: [4], rows: R.loGame.map((r, i) => ({ note: r.note, o: [r.owner, r.opp], h: `<td><span class="rk">${i + 1}</span></td>${cell(r.owner, r.team)}<td>${r.y}</td><td>${r.wk}${kindTag(r)}</td><td class="l hide-sm">${esc(r.opp)}</td><td class="pts">${f2(r.v)}${star(r)}</td>` })),
       hero: () => { const r = R.loGame[0]; return { l: "Record low", nm: r.owner, meta: `${r.team} · Week ${r.wk}, ${r.y} vs ${r.opp}`, v: f2(r.v), u: "Points" } } },
     { id: "hiAgainst", grp: "Scoring lows", name: "Most points against in a season", note: "The toughest schedules in league history. Regular season points against, top 10.",
       head: ["#", "Owner", "Season", "W–L", "Points against"], hideSm: [3], rows: R.hiAgainst.map((r, i) => ({ o: [r.owner], h: `<td><span class="rk">${i + 1}</span></td>${cell(r.owner, r.team)}<td>${r.y}${games13(r)}</td><td class="hide-sm">${r.rec}</td><td class="pts">${f2(r.v)}</td>` })),
@@ -157,10 +161,12 @@
     const h = b.hero();
     $("holder").innerHTML = `<div class="holder"><div><div class="l">${b.name} · ${h.l}</div><div class="nm">${esc(h.nm)}</div><div class="meta">${esc(h.meta)}</div></div><div class="v">${h.v}<small>${h.u}</small></div></div>`;
     $("recNote").textContent = b.note;
-    $("recTeamLbl").hidden = $("recPanel").hidden = !!b.custom; $("atBox").hidden = !b.custom;
+    $("recTeamLbl").hidden = $("recPanel").hidden = $("recFoot").hidden = !!b.custom; $("atBox").hidden = !b.custom;
     store.set("ffBook", cur);
     if (b.custom) { drawAllTime(); return }
     const rows = b.rows.filter(r => !tf || r.o.includes(tf));
+    const notes = [...new Set(rows.map(r => r.note).filter(Boolean))];
+    $("recFoot").innerHTML = notes.map(n => `* ${esc(n)}`).join("<br>");
     $("recTable").innerHTML = `<thead><tr>${b.head.map((c, i) => `<th class="${i === 1 || /Runner|Opponent/.test(c) ? "l" : ""}${b.hideSm.includes(i) ? " hide-sm" : ""}">${c}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map(r => `<tr>${r.h}</tr>`).join("") : `<tr><td colspan="${b.head.length}" style="text-align:left;color:var(--muted)">${esc(tf)} doesn't appear in this record book.</td></tr>`}</tbody>`;
   }
   $("cats").onclick = e => { const x = e.target.closest("button"); if (x) { cur = x.dataset.id; drawBook() } };

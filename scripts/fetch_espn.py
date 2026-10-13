@@ -24,7 +24,7 @@ RAW_DIR = ROOT / "data" / "raw"
 BASE = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl"
 # mTeam: teams + owners, mMatchupScore: every game's score, mSettings: divisions and
 # schedule settings, mStandings: final ranks and playoff seeds, mNav: member names
-VIEWS = ["mTeam", "mMatchupScore", "mSettings", "mStandings", "mNav"]
+VIEWS = ["mTeam", "mMatchupScore", "mSettings", "mStandings", "mNav", "mStatus"]
 
 
 def load_env():
@@ -63,6 +63,45 @@ def fetch_season(session, year):
     return r.json()
 
 
+POSITIONS = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "D/ST"}
+
+
+def fetch_projections(session, year, season):
+    """Weekly projected points for every rostered player, for the rest of the regular season.
+
+    ESPN returns a player's projections for the requested week and the week before it, so
+    every other week is requested. Saved as data/raw/<year>_projections.json for build_data.py.
+    """
+    sched = season["settings"]["scheduleSettings"]
+    reg = sched["matchupPeriodCount"]
+    current = season["status"]["currentMatchupPeriod"]
+    if not season["status"].get("isActive") or current > reg:
+        return None
+    url = f"{BASE}/seasons/{year}/segments/0/leagues/{LEAGUE_ID}"
+    weeks = list(range(current, reg + 1, 2))
+    if weeks[-1] < reg:
+        weeks.append(reg)
+    teams = {}
+    for i, week in enumerate(weeks):
+        r = session.get(url, params={"view": "mRoster", "scoringPeriodId": week}, timeout=30)
+        r.raise_for_status()
+        for t in r.json()["teams"]:
+            players = teams.setdefault(str(t["id"]), {})
+            for e in t["roster"]["entries"]:
+                p = e["playerPoolEntry"]["player"]
+                row = players.setdefault(str(p["id"]), {
+                    "name": p["fullName"], "pos": POSITIONS.get(p.get("defaultPositionId"), ""),
+                    "elig": p.get("eligibleSlots", []), "slot": e["lineupSlotId"], "proj": {}})
+                if i == 0:
+                    row["slot"] = e["lineupSlotId"]  # lineup as set for the current week
+                for s in p.get("stats", []):
+                    if s.get("statSourceId") == 1 and s.get("statSplitTypeId") == 1:
+                        row["proj"][str(s["scoringPeriodId"])] = round(s.get("appliedTotal", 0), 2)
+        time.sleep(1)
+    slots = {k: v for k, v in season["settings"]["rosterSettings"]["lineupSlotCounts"].items() if v}
+    return {"year": year, "currentWeek": current, "lineupSlotCounts": slots, "teams": teams}
+
+
 def main():
     cookies = load_env()
     years = [int(y) for y in sys.argv[1:]] or list(range(FIRST_SEASON, current_season() + 1))
@@ -79,6 +118,11 @@ def main():
         games = len(data.get("schedule", []))
         print(f"{year}: {teams} teams, {games} matchups -> {out.relative_to(ROOT)}")
         time.sleep(1)  # be polite to an unofficial API
+        proj = fetch_projections(session, year, data) if year == current_season() else None
+        if proj:
+            pout = RAW_DIR / f"{year}_projections.json"
+            pout.write_text(json.dumps(proj, separators=(",", ":")))
+            print(f"{year}: projections from week {proj['currentWeek']} -> {pout.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
