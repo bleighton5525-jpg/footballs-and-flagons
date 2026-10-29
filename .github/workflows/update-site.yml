@@ -1,10 +1,12 @@
 # Pulls the latest results from ESPN, rebuilds the site data and publishes to GitHub Pages.
-# Runs every Tuesday morning, on every push to main, and on demand from the Actions tab.
+# Runs Tuesday and Thursday mornings, on every push to main, and on demand from the Actions tab.
 name: Update and publish site
 
 on:
   schedule:
-    - cron: "0 10 * * 2"   # Tuesdays 10:00 UTC: 5 a.m. Central (CDT), 4 a.m. after clocks fall back
+    # 10:00 UTC = 5 a.m. Central (CDT), 4 a.m. after clocks fall back
+    - cron: "0 10 * * 2"   # Tuesday: last week's results
+    - cron: "0 10 * * 4"   # Thursday: refreshed lineups and projections before kickoff
   push:
     branches: [main]
   workflow_dispatch:
@@ -47,7 +49,7 @@ jobs:
           git config user.name "league-bot"
           git config user.email "league-bot@users.noreply.github.com"
           git add data/raw data/power_history.json site/data
-          git diff --cached --quiet || git commit -m "Weekly ESPN update $(date -u +%Y-%m-%d)"
+          git diff --cached --quiet || git commit -m "ESPN update $(date -u +%Y-%m-%d)"
           git push
 
       - uses: actions/upload-pages-artifact@v5
